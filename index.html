@@ -408,8 +408,8 @@ function renderQueue() {
     return;
   }
   el.innerHTML = L.map((r) => {
-    const who = r.reporter ? (state.names[r.reporter] || "Someone") : "Someone";
-    const photo = r.photo ? `<img src="${esc(r.photo)}" alt="Photo of the reported spot">` : `<span>No photo</span>`;
+    const who = r.reporter ? (state.names[r.reporter] || "a student") : "a student";
+    const photo = r.photo ? `<img src="${esc(r.photo)}" alt="Photo of the reported spot">` : `<svg width="34" height="34" viewBox="0 0 28 28" aria-label="No photo" role="img"><rect width="28" height="28" rx="8" fill="var(--line)"/><path d="M8 19l5-11 2 1-4 10z" fill="var(--muted)"/><path d="M11 18h8l-1 4h-8z" fill="var(--muted)"/></svg>`;
     let act = "";
     if (state.canWrite) {
       if (r.status === "open") act = `<button class="btn sm pine" data-act="start" data-id="${r.id}">Start cleaning</button>`;
@@ -420,7 +420,7 @@ function renderQueue() {
     return `<article class="report sev-${esc(r.severity)}">
       <div class="ph">${photo}</div>
       <div class="body">
-        <div class="top"><h3>${esc(catName[r.category] || r.category)}</h3>${r.demo ? `<span class="demo-tag">demo</span>` : ""}<span class="pill ${r.status}">${STATUS_LABEL[r.status]}</span></div>
+        <div class="top"><h3>${esc(catName[r.category] || r.category)}</h3><span class="pill ${r.status}">${STATUS_LABEL[r.status]}</span></div>
         <div class="meta"><b>${esc(r.zone)}</b>${r.spot ? " · " + esc(r.spot) : ""}</div>
         ${r.note ? `<p class="note">${esc(r.note)}</p>` : ""}
         <div class="meta">${r.severity === "high" ? "<b style='color:var(--open)'>Urgent</b> · " : ""}Reported by ${esc(who)} · <span class="mono">${ago(r.createdAt)}</span></div>
