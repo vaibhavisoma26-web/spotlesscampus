@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Report litter and dirty spots on campus and track them until they're cleaned.">
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%}</style>
+<title>Spotless Campus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&family=Sora:wght@600;800&family=Fredoka:wght@500;700&family=Archivo+Black&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a sticky top bar with three tabs (Report / Queue / Overview); one centered working column, cards only for reports. */
+:root {
+  --bg: #f3f5f1;
+  --surface: #ffffff;
+  --ink: #18261f;
+  --muted: #5c6b63;
+  --line: #dbe2dc;
+  --pine: #1f4d3a;
+  --broom: #e3a72f;
+  --broom-ink: #3a2a05;
+  --open: #c4462f;
+  --open-bg: #fbe7e2;
+  --prog: #9a6a00;
+  --prog-bg: #fbf0d6;
+  --done: #2c7a4b;
+  --done-bg: #e0f1e6;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --r: 12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111a16; --surface: #18241f; --ink: #e6ede8; --muted: #9aaba2; --line: #2a3a33;
+  --pine: #8fd1ae; --broom: #f0b844; --broom-ink: #2a1e03;
+  --open: #ff8a73; --open-bg: #3a1e18; --prog: #f2c25a; --prog-bg: #33290f; --done: #7fd3a0; --done-bg: #16301f;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111a16; --surface: #18241f; --ink: #e6ede8; --muted: #9aaba2; --line: #2a3a33;
+  --pine: #8fd1ae; --broom: #f0b844; --broom-ink: #2a1e03;
+  --open: #ff8a73; --open-bg: #3a1e18; --prog: #f2c25a; --prog-bg: #33290f; --done: #7fd3a0; --done-bg: #16301f;
+  color-scheme: dark; }
+
+/* Design skins: each redefines the same tokens on body, in light and dark. "pine" is the base above. */
+body[data-skin="ocean"] { --bg: #edf3f9; --surface: #ffffff; --ink: #11233a; --muted: #55677d; --line: #d3dfec; --pine: #1d4e89; --broom: #ff7a59; --broom-ink: #3b1206; --font-display: "Sora", "Segoe UI", system-ui, sans-serif; --r: 6px; }
+body[data-skin="festival"] { --bg: #f6f2fc; --surface: #ffffff; --ink: #24133a; --muted: #6a5a80; --line: #e2d8f0; --pine: #6b2fa3; --broom: #ffcf33; --broom-ink: #3a2a00; --font-display: "Fredoka", "Segoe UI", system-ui, sans-serif; --r: 20px; }
+body[data-skin="brick"] { --bg: #f6f3f1; --surface: #ffffff; --ink: #221a18; --muted: #6d625e; --line: #e2d9d4; --pine: #9e2a2b; --broom: #2a9d8f; --broom-ink: #ffffff; --font-display: "Archivo Black", "Arial Black", system-ui, sans-serif; --r: 2px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body[data-skin="ocean"] { --bg: #0d1724; --surface: #142236; --ink: #e4edf7; --muted: #93a6bd; --line: #24364d; --pine: #7fb2f0; --broom: #ff9478; --broom-ink: #2b0d04; }
+  :root:not([data-theme="light"]) body[data-skin="festival"] { --bg: #160f22; --surface: #201734; --ink: #efe8f8; --muted: #a898bf; --line: #34284a; --pine: #c49af0; --broom: #ffd84f; --broom-ink: #2b1f00; }
+  :root:not([data-theme="light"]) body[data-skin="brick"] { --bg: #171211; --surface: #221a19; --ink: #f1e9e6; --muted: #ab9d98; --line: #3a2e2c; --pine: #f08a7e; --broom: #4cc4b5; --broom-ink: #062a25; }
+}
+:root[data-theme="dark"] body[data-skin="ocean"] { --bg: #0d1724; --surface: #142236; --ink: #e4edf7; --muted: #93a6bd; --line: #24364d; --pine: #7fb2f0; --broom: #ff9478; --broom-ink: #2b0d04; }
+:root[data-theme="dark"] body[data-skin="festival"] { --bg: #160f22; --surface: #201734; --ink: #efe8f8; --muted: #a898bf; --line: #34284a; --pine: #c49af0; --broom: #ffd84f; --broom-ink: #2b1f00; }
+:root[data-theme="dark"] body[data-skin="brick"] { --bg: #171211; --surface: #221a19; --ink: #f1e9e6; --muted: #ab9d98; --line: #3a2e2c; --pine: #f08a7e; --broom: #4cc4b5; --broom-ink: #062a25; }
+body[data-skin="brick"] h1, body[data-skin="brick"] h2 { text-transform: uppercase; letter-spacing: 0.01em; font-weight: 400; }
+body[data-skin="festival"] .report, body[data-skin="festival"] form.card { border-width: 2px; }
+
+.skins { display: flex; gap: 6px; align-items: center; }
+.skins .lbl { font-size: 12px; color: var(--muted); margin-right: 2px; }
+.skins button { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line); cursor: pointer; padding: 0; }
+.skins button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink); }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--broom); outline-offset: 2px; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar-in { max-width: 920px; margin: 0 auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+.brand h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+.brand svg { flex: none; }
+.tabs { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 999px; }
+.tabs a { text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 14px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.tabs a[aria-current="page"] { background: var(--pine); color: var(--surface); }
+.tabs .count { font-family: var(--font-mono); font-size: 11px; background: var(--open); color: #fff; border-radius: 999px; padding: 0 6px; }
+
+main { max-width: 920px; margin: 0 auto; padding-block: 24px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.view { display: grid; gap: 20px; }
+.lede { color: var(--muted); max-width: 62ch; margin: 4px 0 0; }
+.notice { background: var(--prog-bg); color: var(--ink); border-radius: var(--r); padding: 12px 14px; font-size: 14px; }
+
+/* Report form */
+.split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 24px; align-items: start; }
+@media (max-width: 760px) { .split { grid-template-columns: minmax(0, 1fr); } }
+form.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+select, input[type=text], textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+textarea { min-height: 72px; resize: vertical; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 460px) { .row2 { grid-template-columns: 1fr; } }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip span { display: inline-block; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; font-size: 14px; background: var(--bg); }
+.chip input:checked + span { background: var(--pine); color: var(--surface); border-color: var(--pine); }
+.chip input:focus-visible + span { outline: 2px solid var(--broom); outline-offset: 2px; }
+.photo-drop { border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; display: flex; gap: 12px; align-items: center; cursor: pointer; background: var(--bg); }
+.photo-drop img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; }
+.photo-drop small { color: var(--muted); display: block; }
+.btn { border: 0; border-radius: 999px; padding: 10px 18px; font-weight: 600; cursor: pointer; background: var(--line); }
+.btn.primary { background: var(--broom); color: var(--broom-ink); }
+.btn.pine { background: var(--pine); color: var(--surface); }
+.btn.ghost { background: transparent; border: 1px solid var(--line); }
+.btn.sm { padding: 6px 12px; font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-weight: 600; z-index: 20; }
+
+.side h3 { font-size: 16px; margin-bottom: 10px; }
+.mini { display: grid; gap: 8px; }
+.mini-item { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: 14px; }
+.mini-item > div { min-width: 0; }
+.mini-item b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-item small { color: var(--muted); }
+
+/* Status pills */
+.pill { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+.pill.open { background: var(--open-bg); color: var(--open); }
+.pill.progress { background: var(--prog-bg); color: var(--prog); }
+.pill.resolved { background: var(--done-bg); color: var(--done); }
+
+/* Queue */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filters select { width: auto; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.list { display: grid; gap: 12px; }
+.report { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); display: grid; grid-template-columns: 96px minmax(0, 1fr); overflow: hidden; }
+.report.sev-high { border-left: 4px solid var(--open); }
+.report .ph { background: var(--bg); display: grid; place-items: center; color: var(--muted); font-size: 12px; text-align: center; }
+.report .ph img { width: 100%; height: 100%; object-fit: cover; }
+.report .body { padding: 12px 14px; display: grid; gap: 6px; }
+.report .top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.report h3 { font-size: 16px; font-weight: 600; margin-right: auto; }
+.meta { color: var(--muted); font-size: 13px; font-family: var(--font-body); }
+.meta .mono { font-family: var(--font-mono); font-size: 12px; }
+.note { margin: 0; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 4px; }
+.actions input { flex: 1 1 180px; padding: 6px 10px; font-size: 13px; }
+.resolution { font-size: 13px; color: var(--done); }
+.demo-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); padding: 0 6px; border-radius: 4px; }
+@media (max-width: 460px) { .report { grid-template-columns: 72px minmax(0, 1fr); } }
+
+.empty { text-align: center; padding: 40px 16px; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--r); color: var(--muted); display: grid; gap: 12px; justify-items: center; }
+
+/* Overview */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; }
+.kpi .v { font-family: var(--font-display); font-weight: 800; font-size: 30px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.kpi .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+.panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 700px) { .panels { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+.panel h3 { font-size: 16px; margin-bottom: 4px; }
+.panel p.sub { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+.bars { display: grid; gap: 8px; }
+.barrow { display: grid; grid-template-columns: minmax(0, 9em) minmax(0, 1fr) 3.5em; gap: 10px; align-items: center; font-size: 13px; }
+.barrow .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.track { height: 12px; background: var(--bg); border-radius: 999px; overflow: hidden; display: flex; }
+.track i { display: block; height: 100%; }
+.track .o { background: var(--open); } .track .p { background: var(--broom); } .track .d { background: var(--done); }
+.barrow .n { font-family: var(--font-mono); font-size: 12px; text-align: right; color: var(--muted); }
+.legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 10px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.owner-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) { .report, .mini-item { transition: border-color .15s; } }
+</style>
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="var(--pine)"/><path d="M8 19l5-11 2 1-4 10z" fill="var(--broom)"/><path d="M11 18h8l-1 4h-8z" fill="var(--surface)"/></svg>
+    <h1>Spotless Campus</h1>
+  </div>
+  <div class="skins" role="group" aria-label="Design">
+    <span class="lbl">Design</span>
+    <button type="button" data-skin="pine" title="Pine" aria-label="Pine design" style="background:linear-gradient(135deg,#1f4d3a 50%,#e3a72f 50%)"></button>
+    <button type="button" data-skin="ocean" title="Ocean" aria-label="Ocean design" style="background:linear-gradient(135deg,#1d4e89 50%,#ff7a59 50%)"></button>
+    <button type="button" data-skin="festival" title="Festival" aria-label="Festival design" style="background:linear-gradient(135deg,#6b2fa3 50%,#ffcf33 50%)"></button>
+    <button type="button" data-skin="brick" title="Brick" aria-label="Brick design" style="background:linear-gradient(135deg,#9e2a2b 50%,#2a9d8f 50%)"></button>
+  </div>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#report" data-tab="report">Report</a>
+    <a href="#queue" data-tab="queue">Cleaning queue <span class="count" id="openCount" hidden></span></a>
+    <a href="#overview" data-tab="overview">Overview</a>
+  </nav>
+</div></header>
+
+<main>
+  <div id="statusNote" class="notice" hidden></div>
+
+  <!-- REPORT -->
+  <section class="view" data-view="report">
+    <div>
+      <h2>Spotted a mess?</h2>
+      <p class="lede">Tell the cleaning team what and where. A photo helps them find it fast. You can follow the status of your reports on the right.</p>
+    </div>
+    <div class="split">
+      <form class="card" id="reportForm" novalidate>
+        <div class="field">
+          <span class="label">What is it?</span>
+          <div class="chips" id="catChips"></div>
+        </div>
+        <div class="row2">
+          <label class="field"><span class="label">Where on campus</span>
+            <select id="zone" required></select></label>
+          <label class="field"><span class="label">How urgent</span>
+            <select id="severity">
+              <option value="low">Low: can wait a day</option>
+              <option value="medium" selected>Medium: today please</option>
+              <option value="high">High: health or safety risk</option>
+            </select></label>
+        </div>
+        <label class="field"><span class="label">Exact spot</span>
+          <input type="text" id="spot" maxlength="120" placeholder="e.g. 2nd floor, near the water cooler"></label>
+        <label class="field"><span class="label">Details (optional)</span>
+          <textarea id="note" maxlength="500" placeholder="Anything that helps the team"></textarea></label>
+        <div class="field">
+          <span class="label">Photo (optional)</span>
+          <label class="photo-drop" for="photo">
+            <img id="photoPreview" alt="" hidden>
+            <span><b id="photoLabel">Add a photo</b><small>Taken on your phone or picked from files</small></span>
+          </label>
+          <input type="file" id="photo" accept="image/*" capture="environment" hidden>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn primary" id="submitBtn" type="submit">Send report</button>
+          <span class="meta" id="formMsg"></span>
+        </div>
+      </form>
+      <aside class="side">
+        <h3>Your reports</h3>
+        <div class="mini" id="myList"><div class="meta">Reports you send show up here with their status.</div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- QUEUE -->
+  <section class="view" data-view="queue" hidden>
+    <div>
+      <h2>Cleaning queue</h2>
+      <p class="lede">Everything reported across campus. Urgent ones are marked with a red edge. Start a job when you head out, and mark it resolved when it's clean.</p>
+    </div>
+    <div class="filters">
+      <div class="seg" id="statusSeg" role="group" aria-label="Status filter">
+        <button type="button" data-s="active" aria-pressed="true">To do</button>
+        <button type="button" data-s="open" aria-pressed="false">New</button>
+        <button type="button" data-s="progress" aria-pressed="false">In progress</button>
+        <button type="button" data-s="resolved" aria-pressed="false">Resolved</button>
+        <button type="button" data-s="all" aria-pressed="false">All</button>
+      </div>
+      <select id="zoneFilter" aria-label="Filter by area"><option value="">All areas</option></select>
+    </div>
+    <div class="list" id="queueList"></div>
+  </section>
+
+  <!-- OVERVIEW -->
+  <section class="view" data-view="overview" hidden>
+    <div>
+      <h2>Campus overview</h2>
+      <p class="lede">Where problems pile up and how quickly they get fixed. Use it to plan bins, rotas and cleaning rounds.</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">Open now</div><div class="v" id="kOpen">0</div></div>
+      <div class="kpi"><div class="k">In progress</div><div class="v" id="kProg">0</div></div>
+      <div class="kpi"><div class="k">Resolved (7 days)</div><div class="v" id="kDone">0</div></div>
+      <div class="kpi"><div class="k">Avg time to fix</div><div class="v" id="kAvg">–</div></div>
+    </div>
+    <div class="panels">
+      <div class="panel"><h3>By area</h3><p class="sub">All reports, split by status</p><div class="bars" id="byZone"></div>
+        <div class="legend"><span><i style="background:var(--open)"></i>New</span><span><i style="background:var(--broom)"></i>In progress</span><span><i style="background:var(--done)"></i>Resolved</span></div></div>
+      <div class="panel"><h3>By type</h3><p class="sub">All reports, split by status</p><div class="bars" id="byCat"></div></div>
+    </div>
+    <div class="owner-tools" id="ownerTools" hidden>
+      <span>Demo tools:</span>
+      <button class="btn sm ghost" id="demoAdd" type="button">Add demo reports</button>
+      <button class="btn sm ghost" id="demoClear" type="button">Remove demo reports</button>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const CATS = [
+  ["litter", "Litter"], ["bin", "Overflowing bin"], ["washroom", "Dirty washroom"],
+  ["spill", "Spill or stain"], ["water", "Stagnant water"], ["damage", "Graffiti or damage"], ["other", "Other"]
+];
+const ZONES = ["Main gate", "Library", "Academic block A", "Academic block B", "Labs", "Canteen", "Hostels", "Sports ground", "Parking", "Admin block", "Auditorium"];
+const catName = Object.fromEntries(CATS);
+const STATUS_LABEL = { open: "New", progress: "In progress", resolved: "Resolved" };
+
+const $ = (s) => document.querySelector(s);
+const state = { reports: [], myId: null, db: null, user: null, names: {}, filter: "active", zone: "", loaded: false, canWrite: true };
+
+// ---------- static UI ----------
+$("#catChips").innerHTML = CATS.map(([v, n], i) =>
+  `<label class="chip"><input type="radio" name="cat" value="${v}" id="cat-${v}" ${i === 0 ? "checked" : ""}><span>${n}</span></label>`).join("");
+$("#zone").innerHTML = ZONES.map((z) => `<option>${z}</option>`).join("");
+$("#zoneFilter").innerHTML += ZONES.map((z) => `<option>${z}</option>`).join("");
+
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function ago(ms) {
+  const m = Math.round((Date.now() - ms) / 60000);
+  if (m < 1) return "just now"; if (m < 60) return m + " min ago";
+  const h = Math.round(m / 60); if (h < 24) return h + " h ago";
+  return Math.round(h / 24) + " d ago";
+}
+function dur(ms) {
+  const m = ms / 60000; if (m < 60) return Math.max(1, Math.round(m)) + "m";
+  const h = m / 60; if (h < 48) return (h < 10 ? h.toFixed(1) : Math.round(h)) + "h";
+  return Math.round(h / 24) + "d";
+}
+let toastT;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2600); }
+function note(msg) { const n = $("#statusNote"); n.textContent = msg || ""; n.hidden = !msg; }
+
+// ---------- design skins (remembered per viewer) ----------
+function setSkin(s) {
+  document.body.dataset.skin = s;
+  document.querySelectorAll(".skins button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.skin === s ? "true" : "false"));
+  try { localStorage.setItem("skin", s); } catch {}
+}
+document.querySelector(".skins").addEventListener("click", (e) => { const b = e.target.closest("button[data-skin]"); if (b) setSkin(b.dataset.skin); });
+let savedSkin = "pine"; try { savedSkin = localStorage.getItem("skin") || "pine"; } catch {}
+setSkin(savedSkin);
+
+// ---------- routing ----------
+function route() {
+  const v = ["report", "queue", "overview"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "report";
+  document.querySelectorAll("[data-view]").forEach((s) => (s.hidden = s.dataset.view !== v));
+  document.querySelectorAll("[data-tab]").forEach((a) => { if (a.dataset.tab === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+}
+addEventListener("hashchange", route); route();
+
+// ---------- photo ----------
+let photoData = null;
+$("#photo").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    photoData = await shrink(f);
+    $("#photoPreview").src = photoData; $("#photoPreview").hidden = false;
+    $("#photoLabel").textContent = "Photo added · tap to change";
+  } catch { photoData = null; toast("That file couldn't be read as an image. Try a JPG or PNG."); }
+});
+function shrink(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onerror = rej;
+    r.onload = () => {
+      const img = new Image();
+      img.onerror = rej;
+      img.onload = () => {
+        let max = 640, q = 0.65, out;
+        for (let i = 0; i < 4; i++) {
+          const s = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          out = c.toDataURL("image/jpeg", q);
+          if (out.length < 150000) break;
+          max *= 0.75; q -= 0.1;
+        }
+        res(out);
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+// ---------- rendering ----------
+function render() {
+  const R = state.reports;
+  const open = R.filter((r) => r.status === "open").length;
+  const prog = R.filter((r) => r.status === "progress").length;
+  const oc = $("#openCount"); oc.textContent = open; oc.hidden = !open;
+  renderMine(); renderQueue(); renderOverview(open, prog);
+}
+
+function renderMine() {
+  const el = $("#myList");
+  if (!state.loaded) { el.innerHTML = `<div class="meta">Loading…</div>`; return; }
+  const mine = state.reports.filter((r) => r.reporter && r.reporter === state.myId).slice(0, 8);
+  if (!mine.length) { el.innerHTML = `<div class="meta">Reports you send show up here with their status.</div>`; return; }
+  el.innerHTML = mine.map((r) => `<div class="mini-item"><div><b>${esc(catName[r.category] || r.category)} · ${esc(r.zone)}</b><small>${ago(r.createdAt)}</small></div><span class="pill ${r.status}">${STATUS_LABEL[r.status]}</span></div>`).join("");
+}
+
+function renderQueue() {
+  const el = $("#queueList");
+  if (!state.loaded) { el.innerHTML = `<div class="empty">Loading reports…</div>`; return; }
+  let L = state.reports.filter((r) =>
+    (state.filter === "all" || (state.filter === "active" ? r.status !== "resolved" : r.status === state.filter)) &&
+    (!state.zone || r.zone === state.zone));
+  const sevRank = { high: 0, medium: 1, low: 2 };
+  if (state.filter === "active" || state.filter === "open" || state.filter === "progress")
+    L = L.slice().sort((a, b) => (sevRank[a.severity] - sevRank[b.severity]) || (a.createdAt - b.createdAt));
+  if (!L.length) {
+    el.innerHTML = `<div class="empty"><b>${state.reports.length ? "Nothing here. All clear for this filter." : "No reports yet."}</b>
+      <span>${state.reports.length ? "Try another status or area." : "When someone sends a report from the Report tab, it lands here."}</span>
+      ${state.reports.length ? "" : `<a class="btn primary" href="#report" style="text-decoration:none">Send the first report</a>`}</div>`;
+    return;
+  }
+  el.innerHTML = L.map((r) => {
+    const who = r.reporter ? (state.names[r.reporter] || "Someone") : "Someone";
+    const photo = r.photo ? `<img src="${esc(r.photo)}" alt="Photo of the reported spot">` : `<span>No photo</span>`;
+    let act = "";
+    if (state.canWrite) {
+      if (r.status === "open") act = `<button class="btn sm pine" data-act="start" data-id="${r.id}">Start cleaning</button>`;
+      if (r.status === "progress") act = `<input type="text" id="res-${r.id}" placeholder="What was done (optional)" maxlength="140"><button class="btn sm primary" data-act="resolve" data-id="${r.id}">Mark resolved</button><button class="btn sm ghost" data-act="reopen" data-id="${r.id}">Back to new</button>`;
+      if (r.status === "resolved") act = `<button class="btn sm ghost" data-act="reopen" data-id="${r.id}">Reopen</button>`;
+    }
+    const resLine = r.status === "resolved" && r.resolvedAt ? `<div class="resolution">Resolved ${ago(r.resolvedAt)} · took ${dur(r.resolvedAt - r.createdAt)}${r.resolution ? " · " + esc(r.resolution) : ""}</div>` : "";
+    return `<article class="report sev-${esc(r.severity)}">
+      <div class="ph">${photo}</div>
+      <div class="body">
+        <div class="top"><h3>${esc(catName[r.category] || r.category)}</h3>${r.demo ? `<span class="demo-tag">demo</span>` : ""}<span class="pill ${r.status}">${STATUS_LABEL[r.status]}</span></div>
+        <div class="meta"><b>${esc(r.zone)}</b>${r.spot ? " · " + esc(r.spot) : ""}</div>
+        ${r.note ? `<p class="note">${esc(r.note)}</p>` : ""}
+        <div class="meta">${r.severity === "high" ? "<b style='color:var(--open)'>Urgent</b> · " : ""}Reported by ${esc(who)} · <span class="mono">${ago(r.createdAt)}</span></div>
+        ${resLine}
+        ${act ? `<div class="actions">${act}</div>` : ""}
+      </div></article>`;
+  }).join("");
+}
+
+function bars(el, keys, label, field) {
+  const rows = keys.map((k) => {
+    const rs = state.reports.filter((r) => r[field] === k);
+    return { k, n: rs.length, o: rs.filter((r) => r.status === "open").length, p: rs.filter((r) => r.status === "progress").length, d: rs.filter((r) => r.status === "resolved").length };
+  }).filter((x) => x.n).sort((a, b) => (b.o + b.p) - (a.o + a.p) || b.n - a.n);
+  const max = Math.max(1, ...rows.map((x) => x.n));
+  el.innerHTML = rows.length ? rows.map((x) => `<div class="barrow"><span class="name" title="${esc(label(x.k))}">${esc(label(x.k))}</span>
+    <span class="track" role="img" aria-label="${x.o} new, ${x.p} in progress, ${x.d} resolved">
+    <i class="o" style="width:${x.o / max * 100}%"></i><i class="p" style="width:${x.p / max * 100}%"></i><i class="d" style="width:${x.d / max * 100}%"></i></span>
+    <span class="n">${x.n}</span></div>`).join("") : `<div class="meta">No reports yet.</div>`;
+}
+
+function renderOverview(open, prog) {
+  const weekAgo = Date.now() - 7 * 864e5;
+  const done = state.reports.filter((r) => r.status === "resolved" && r.resolvedAt);
+  $("#kOpen").textContent = open; $("#kProg").textContent = prog;
+  $("#kDone").textContent = done.filter((r) => r.resolvedAt >= weekAgo).length;
+  $("#kAvg").textContent = done.length ? dur(done.reduce((s, r) => s + (r.resolvedAt - r.createdAt), 0) / done.length) : "–";
+  bars($("#byZone"), ZONES, (k) => k, "zone");
+  bars($("#byCat"), CATS.map((c) => c[0]), (k) => catName[k], "category");
+}
+
+// ---------- names ----------
+// The public site has no accounts, so reports show "you" for your own and "a visitor" for others.
+function resolveNames() {
+  for (const r of state.reports) if (r.reporter) state.names[r.reporter] = r.reporter === state.myId ? "you" : "a visitor";
+}
+
+// ---------- actions ----------
+$("#reportForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!state.db) { toast("Still connecting. Try again in a moment."); return; }
+  const btn = $("#submitBtn"); btn.disabled = true; $("#formMsg").textContent = "Sending…";
+  const now = Date.now();
+  const doc = {
+    category: document.querySelector("input[name=cat]:checked").value,
+    zone: $("#zone").value, severity: $("#severity").value,
+    spot: $("#spot").value.trim().slice(0, 120), note: $("#note").value.trim().slice(0, 500),
+    photo: photoData, status: "open", createdAt: now, updatedAt: now, reporter: state.myId || null
+  };
+  try {
+    await state.db.collection("reports").add(doc);
+    $("#reportForm").reset(); photoData = null; $("#photoPreview").hidden = true; $("#photoLabel").textContent = "Add a photo";
+    $("#formMsg").textContent = ""; toast("Report sent. Thanks for keeping campus clean!");
+  } catch (err) {
+    $("#formMsg").textContent = err && err.code === "permission-denied" ? "The database refused this report. Check that the photo is under 700 KB." : "Couldn't send. Check your connection and try again.";
+  } finally { btn.disabled = false; }
+});
+
+$("#queueList").addEventListener("click", async (e) => {
+  const b = e.target.closest("button[data-act]"); if (!b || !state.db) return;
+  const id = b.dataset.id, act = b.dataset.act, now = Date.now();
+  let patch;
+  if (act === "start") patch = { status: "progress", startedAt: now, updatedAt: now };
+  if (act === "resolve") patch = { status: "resolved", resolvedAt: now, updatedAt: now, resolution: ($("#res-" + id)?.value || "").trim().slice(0, 140) };
+  if (act === "reopen") patch = { status: "open", resolvedAt: null, resolution: "", updatedAt: now };
+  b.disabled = true;
+  try { await state.db.doc("reports/" + id).update(patch); toast(act === "resolve" ? "Marked resolved" : act === "start" ? "Started. It's in progress." : "Moved back to new"); }
+  catch (err) { b.disabled = false; toast("Couldn't update. Try again."); }
+});
+
+$("#statusSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.filter = b.dataset.s;
+  document.querySelectorAll("#statusSeg button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  renderQueue();
+});
+$("#zoneFilter").addEventListener("change", (e) => { state.zone = e.target.value; renderQueue(); });
+
+// demo data (owner only)
+$("#demoAdd").addEventListener("click", async () => {
+  const H = 3600e3, now = Date.now();
+  const demo = [
+    { category: "bin", zone: "Canteen", severity: "high", spot: "Bins behind the counter", note: "Overflowing since lunch, crows getting into it.", status: "open", createdAt: now - 2 * H },
+    { category: "washroom", zone: "Academic block A", severity: "high", spot: "Ground floor gents", note: "No water, floor is dirty.", status: "progress", createdAt: now - 5 * H, startedAt: now - 1 * H },
+    { category: "litter", zone: "Sports ground", severity: "medium", spot: "Near the bleachers", note: "Plastic bottles and wrappers after the match.", status: "open", createdAt: now - 9 * H },
+    { category: "water", zone: "Hostels", severity: "medium", spot: "Behind hostel block C", note: "Stagnant water, mosquito risk.", status: "open", createdAt: now - 26 * H },
+    { category: "spill", zone: "Library", severity: "low", spot: "Reading room, row 4", note: "Coffee spill on the carpet.", status: "resolved", createdAt: now - 30 * H, resolvedAt: now - 27 * H, resolution: "Carpet shampooed" },
+    { category: "litter", zone: "Parking", severity: "low", spot: "Two-wheeler parking", note: "", status: "resolved", createdAt: now - 50 * H, resolvedAt: now - 40 * H, resolution: "Swept" },
+    { category: "bin", zone: "Canteen", severity: "medium", spot: "Main entrance", note: "", status: "resolved", createdAt: now - 72 * H, resolvedAt: now - 70 * H, resolution: "Emptied, added a second bin" }
+  ];
+  try {
+    for (const d of demo) await state.db.collection("reports").add({ ...d, photo: null, reporter: null, demo: true, updatedAt: now });
+    toast("Added 7 demo reports");
+  } catch { toast("Couldn't add demo reports."); }
+});
+$("#demoClear").addEventListener("click", async () => {
+  const ds = state.reports.filter((r) => r.demo);
+  try { for (const r of ds) await state.db.doc("reports/" + r.id).delete(); toast(`Removed ${ds.length} demo reports`); }
+  catch { toast("Couldn't remove demo reports."); }
+});
+
+// ---------- boot ----------
+// Demo mode: reports are kept in this browser, so the app works with no server.
+const KEY = "spotless-reports-v1";
+const listeners = [];
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch { return null; } }
+let store = load();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch {} listeners.forEach((fn) => fn()); }
+function sampleData() {
+  const H = 3600e3, now = Date.now();
+  const rows = [
+    { category: "bin", zone: "Canteen", severity: "high", spot: "Bins behind the counter", note: "Overflowing since lunch, crows getting into it.", status: "open", createdAt: now - 2 * H },
+    { category: "washroom", zone: "Academic block A", severity: "high", spot: "Ground floor washroom", note: "No water, floor is dirty.", status: "progress", createdAt: now - 5 * H, startedAt: now - 1 * H },
+    { category: "litter", zone: "Sports ground", severity: "medium", spot: "Near the bleachers", note: "Plastic bottles and wrappers after the match.", status: "open", createdAt: now - 9 * H },
+    { category: "water", zone: "Hostels", severity: "medium", spot: "Behind hostel block C", note: "Stagnant water, mosquito risk.", status: "open", createdAt: now - 26 * H },
+    { category: "damage", zone: "Labs", severity: "low", spot: "Chemistry lab corridor", note: "Graffiti on the wall near the notice board.", status: "open", createdAt: now - 31 * H },
+    { category: "spill", zone: "Library", severity: "low", spot: "Reading room, row 4", note: "Coffee spill on the carpet.", status: "resolved", createdAt: now - 30 * H, resolvedAt: now - 27 * H, resolution: "Carpet shampooed" },
+    { category: "litter", zone: "Parking", severity: "low", spot: "Two-wheeler parking", note: "", status: "resolved", createdAt: now - 50 * H, resolvedAt: now - 40 * H, resolution: "Swept" },
+    { category: "bin", zone: "Canteen", severity: "medium", spot: "Main entrance", note: "", status: "resolved", createdAt: now - 72 * H, resolvedAt: now - 70 * H, resolution: "Emptied, added a second bin" },
+    { category: "litter", zone: "Main gate", severity: "medium", spot: "Bus stop shelter", note: "", status: "resolved", createdAt: now - 96 * H, resolvedAt: now - 90 * H, resolution: "Cleared" }
+  ];
+  const out = {};
+  rows.forEach((r, i) => { out["s" + i] = { ...r, photo: null, reporter: null, demo: true, updatedAt: r.resolvedAt || r.startedAt || r.createdAt }; });
+  return out;
+}
+if (!store) { store = sampleData(); save(); }
+state.myId = "me";
+const delay = () => new Promise((r) => setTimeout(r, 150));
+state.db = {
+  collection: () => ({
+    add: async (d) => { await delay(); const id = "r" + Date.now().toString(36); store[id] = d; save(); return { id }; }
+  }),
+  doc: (path) => {
+    const id = path.split("/")[1];
+    return {
+      update: async (p) => { await delay(); if (store[id]) { store[id] = { ...store[id], ...p }; save(); } },
+      delete: async () => { await delay(); delete store[id]; save(); }
+    };
+  }
+};
+function refresh() {
+  state.reports = Object.entries(store).map(([id, d]) => ({ id, ...d })).sort((a, b) => b.createdAt - a.createdAt);
+  state.loaded = true; resolveNames(); render();
+}
+listeners.push(refresh);
+addEventListener("storage", (e) => { if (e.key === KEY) { store = load() || {}; refresh(); } });
+// Reset button: open the page with ?demo to show it at the bottom of the Overview tab.
+if (new URLSearchParams(location.search).has("demo")) $("#ownerTools").hidden = false;
+$("#demoAdd").textContent = "Reset to sample data";
+$("#demoAdd").replaceWith($("#demoAdd").cloneNode(true));
+$("#demoAdd").addEventListener("click", () => { store = sampleData(); save(); toast("Sample data restored"); });
+$("#demoClear").textContent = "Clear all reports";
+$("#demoClear").replaceWith($("#demoClear").cloneNode(true));
+$("#demoClear").addEventListener("click", () => { store = {}; save(); toast("All reports cleared"); });
+refresh();
+</script>
+</body>
+</html>
